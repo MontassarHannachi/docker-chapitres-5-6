@@ -2,23 +2,23 @@
 
 ## 1. Objectifs
 
-- Comprendre les sauvegardes des données PostgreSQL.
-- Identifier une sauvegarde logique et une sauvegarde physique.
-- Vérifier les données présentes dans le volume utilise par un conteneur.
+- Comprendre les mécanismes de sauvegarde des données PostgreSQL.
+- Distinguer une sauvegarde logique d'une sauvegarde physique.
+- Vérifier les données présentes dans un volume Docker utilisé par un conteneur.
 
 ## 2. Environnement
 
-- Systeme : Ubuntu
+- Système : Ubuntu
 - Conteneurisation : Docker
-- Image PostgreSQL : postgres:16-alpine
-- Base : cours
-- Utilisateur : etudiant
+- Image PostgreSQL : `postgres:16-alpine`
+- Base de données : `cours`
+- Utilisateur : `etudiant`
 
 ## 3. Sauvegarde logique
 
-Le fichier `~/sauvegardes/cours.sql` a ete identifie comme un export PostgreSQL produit avec pg_dump version 16.15.
+Le fichier `~/sauvegardes/cours.sql` a été identifié comme un export PostgreSQL produit avec `pg_dump` version 16.15.
 
-L inspection a confirme la presence de la table notes et des enregistrements suivants :
+Son inspection a confirmé la présence de la table `notes` et des enregistrements suivants :
 
 | id | texte |
 |---:|---|
@@ -26,32 +26,42 @@ L inspection a confirme la presence de la table notes et des enregistrements sui
 | 34 | deuxieme note |
 | 35 | troisieme note |
 
-Le fichier se termine par la mention PostgreSQL database dump complete.
+Le fichier se termine par la mention `PostgreSQL database dump complete`.
+
+![Inspection du fichier de sauvegarde SQL](screenshots/01-dump-sql.png)
 
 ## 4. Sauvegarde physique
 
-L archive `~/sauvegardes/pgdata.tar.gz` a ete retrouvee. Sa taille verifiee est de 6 666 209 octets. Son contenu a ete inspecte avec `tar -tzf` et contient notamment les repertoires pg_wal, global et pg_logical ainsi que le fichier pg_hba.conf.
+L’archive `~/sauvegardes/pgdata.tar.gz` a été retrouvée. Sa taille vérifiée est de 6 666 209 octets.
 
-Cette inspection confirme la presence de fichiers de donnees PostgreSQL dans l archive.
+Son contenu a été inspecté avec `tar -tzf`. Il comprend notamment les répertoires `pg_wal`, `global` et `pg_logical`, ainsi que le fichier `pg_hba.conf`.
 
-## 5. Verification du volume
+Cette inspection confirme la présence de fichiers de données PostgreSQL dans l’archive.
 
-Le conteneur `db` utilise le volume Docker `pgdata-restaure`, monte dans `/var/lib/postgresql/data`.
+![Inspection de l’archive physique](screenshots/02-archive-physique.png)
 
-La commande suivante a permis de verifier les donnees :
+## 5. Vérification du volume
+
+Le conteneur `db` utilise le volume Docker `pgdata-restaure`, monté dans `/var/lib/postgresql/data`.
+
+La commande suivante a permis de vérifier les données présentes dans la base :
 
 ```bash
 docker exec db psql -U etudiant -d cours -c "SELECT * FROM notes;"
 ```
 
-Les trois enregistrements observes sont les memes que ceux presents dans le fichier SQL.
+Les trois enregistrements observés sont identiques à ceux présents dans le fichier SQL.
 
-## 6. Limites de verification
+![Vérification du volume et des données](screenshots/03-volume-et-donnees.png)
 
-Les verifications confirment l existence du dump SQL, de l archive physique et des donnees dans le volume actuellement utilise.
+## 6. Limites de vérification
 
-Elles ne permettent toutefois pas de prouver si le volume pgdata-restaure provient de l archive physique ou du fichier SQL. La methode exacte de restauration ne peut donc pas etre affirmee.
+Les vérifications confirment l’existence du dump SQL, de l’archive physique et des données dans le volume actuellement utilisé.
+
+Elles ne permettent toutefois pas de déterminer si le volume `pgdata-restaure` provient de l’archive physique ou du fichier SQL. La méthode exacte de restauration ne peut donc pas être affirmée.
 
 ## 7. Conclusion
 
-Ce laboratoire presente deux approches de sauvegarde PostgreSQL : l export logique avec pg_dump et l archivage physique des fichiers de donnees. Il montre egalement l importance de verifier le contenu des sauvegardes et les donnees disponibles apres restauration.
+Ce laboratoire présente deux approches de sauvegarde PostgreSQL : l’export logique avec `pg_dump` et l’archivage physique des fichiers de données.
+
+Il montre également l’importance de vérifier le contenu des sauvegardes et les données disponibles après une restauration.
