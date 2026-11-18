@@ -1,0 +1,14 @@
+# Secrets et variables d'environnement
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+
+# Fichiers temporaires
+*.log
+*.tmp
+*.swp
+.DS_Store
+Thumbs.db
