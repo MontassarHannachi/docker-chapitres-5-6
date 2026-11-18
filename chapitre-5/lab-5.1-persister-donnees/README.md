@@ -137,3 +137,17 @@ Ce laboratoire démontre l'intérêt des volumes Docker pour les applications qu
 La suppression du conteneur `db-lab51-demo`, suivie de sa recréation avec le même volume `pgdata-lab51`, n'a pas entraîné la perte des trois enregistrements PostgreSQL.
 
 Le test confirme donc l'indépendance entre le cycle de vie du conteneur et celui du volume nommé.
+
+## 9. Questions de réflexion
+
+### 1. Pourquoi `docker volume ls` montre-t-il un volume anonyme par conteneur créé à l'étape 1 ?
+
+L'image officielle PostgreSQL déclare un volume sur le chemin `/var/lib/postgresql/data`. Même sans spécifier de volume nommé, Docker crée automatiquement un volume anonyme pour stocker les données de PostgreSQL. Chaque nouveau conteneur peut donc recevoir un nouveau volume anonyme.
+
+### 2. Pourquoi les variables d'environnement `POSTGRES_*` sont-elles ignorées au second démarrage ?
+
+Les variables `POSTGRES_USER`, `POSTGRES_PASSWORD` et `POSTGRES_DB` sont utilisées uniquement lors de l'initialisation d'un répertoire de données PostgreSQL vide. Lorsque le volume contient déjà une base initialisée, PostgreSQL conserve sa configuration existante. Modifier ces variables ne change donc pas automatiquement les identifiants ou la base existante.
+
+### 3. Dans quel cas utiliseriez-vous un bind mount plutôt qu'un volume nommé ?
+
+J'utiliserais un bind mount lorsque je souhaite partager directement un dossier ou un fichier de l'hôte avec un conteneur, par exemple pour développer un site web avec Nginx et modifier les fichiers sans reconstruire ni redémarrer le conteneur. Un volume nommé est préférable pour conserver les données persistantes gérées par Docker, comme celles d'une base PostgreSQL.
